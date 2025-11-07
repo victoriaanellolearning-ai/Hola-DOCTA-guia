@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Estudiante - Córdoba</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Usamos 'Inter' como una fuente moderna y limpia, similar a Helvética */
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            /* Colores de tu paleta */
+            --color-red: #BF1C39;
+            --color-yellow: #FAB900;
+            --color-green: #009641;
+            --color-orange: #EC6608;
+            --color-lightblue: #00A7E7;
+            --color-lime: #95C11F;
+            --color-purple: #951B81;
+            --color-blue: #0069B4;
+        }
+
+        /* Fondo del Hero */
+        .hero-bg {
+            /* REEMPLAZA ESTA URL POR TU IMAGEN DE FONDO */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('foto landing.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Ocultar barra de scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Estilos para el menú desplegable (acordeón) */
+        .submenu-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .submenu[data-state="open"] .submenu-content {
+            max-height: 500px; /* Ajusta si la lista es muy larga */
+        }
+        .submenu[data-state="open"] .submenu-arrow {
+            transform: rotate(90deg);
+        }
+        .submenu-arrow {
+            transition: transform 0.2s;
+        }
+
+        /* Estilos del Modal (Pop-up) */
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+
+    <!-- ========= MODAL (POP-UP) ESTRUCTURA ========= -->
+    <!-- Esta es la ventana en blanco que se reutilizará -->
+    <div id="info-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-[200]">
+        <div class="modal-content w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-6 relative transform scale-95 opacity-0">
+            <!-- Encabezado del Modal -->
+            <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+                <h2 id="modal-title" class="text-2xl font-bold text-[#0069B4]">Título del Modal</h2>
+                <button id="modal-close-btn" class="text-gray-500 hover:text-red-500 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Cuerpo del Modal -->
+            <div id="modal-body" class="mt-4 max-h-[70vh] overflow-y-auto">
+                <p>Aquí irá el contenido cargado...</p>
+            </div>
+        </div>
+    </div>
+    <!-- ========= FIN MODAL ========= -->
+
+
+    <!-- ========= SECCIÓN HERO Y HEADER ========= -->
+    <div class="hero-bg h-screen text-white">
+        <!-- Header (Barra de Navegación) -->
+        <nav class="sticky top-0 z-[100] bg-white/10 backdrop-blur-lg text-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <!-- Logo / Nombre -->
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold tracking-wider">Hola DOCTA</span>
+                    </div>
+                    
+                    <!-- Iconos Derecha (Buscar y Menú) -->
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 rounded-full hover:bg-white/20 transition-colors" aria-label="Buscar">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </button>
+                        <button id="menu-toggle-btn" class="p-2 rounded-full hover:bg-white/20 transition-colors" aria-label="Abrir menú">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Slogan y Descripción -->
+        <div class="h-[calc(100vh-80px)] flex items-center justify-center text-center px-4">
+            <div>
+                <h1 class="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
+                    Tu guía para conocer la capital de los estudiantes
+                </h1>
+                <p class="mt-6 text-xl md:text-2xl max-w-3xl mx-auto drop-shadow-md">
+                    ¡Bienvenido a Córdoba!
+                    Acá vas a encontrar datos, tips, lugares y todo lo que necesitas saber para estudiar, vivir y disfrutar en la ciudad.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========= MENÚ DESPLEGABLE (OCULTO) ========= -->
+    <div id="mobile-menu" data-state="closed" class="hidden fixed top-0 right-0 h-full w-full max-w-sm bg-white text-gray-800 shadow-2xl z-[150] overflow-y-auto transform translate-x-full transition-transform duration-300">
+        <div class="p-4 flex justify-between items-center border-b">
+            <h3 class="text-xl font-bold text-[#BF1C39]">Categorías</h3>
+            <button id="menu-close-btn" class="text-gray-500 hover:text-red-500">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Contenido del Menú (Acordeón) -->
+        <div class="p-4 space-y-2">
+            
+            <!-- Item de Menú: Barrios -->
+            <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Barrios</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Nueva Córdoba</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Centro</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">General Paz</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Güemes</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Alberdi</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Alto Alberdi</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Urca</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Cerro de las Rosas</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Villa Belgrano</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Argüello</a>
+                </div>
+            </div>
+
+            <!-- Item de Menú: Salud -->
+            <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Salud</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Hospitales</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Urgencias</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Obras Sociales</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Farmacias</a>
+                </div>
+            </div>
+
+            <!-- Item de Menú: Casa -->
+            <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Casa</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Bazar</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Ferretería</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Electrodomésticos</a>
+                </div>
+            </div>
+            <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Profesionales</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Gasista</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Electricista</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Plomero</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Cerrajero</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Técnico en Aire</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Técnico en Electrodomésticos</a>
+                </div>
+            </div>
+            <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Mudanza</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Inmobiliaria</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Servicios de Mudanza</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Residencias</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Escribanía</a>
+                </div>
+            </div>
+<div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Compras</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Supermercado</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Verdulería / Feria</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Carnicería</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Dietética</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Distribuidora</a>
+                </div>
+            </div>
+ <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Estudio</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Bibliotecas</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Coworking</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Librería</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Imprenta</a>
+                </div>
+             </div>
+  <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Sociales</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Café</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Restaurante</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Shopping</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Parque / Plaza</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Museo</a>
+                </div>
+            </div>
+   <div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Deportes</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Gimnasio</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Clubes Femenino</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Clubes Masculinos</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Clubes Mixtos</a>
+                </div>
+            </div>
+<div class="submenu border-b pb-2" data-state="closed">
+                <button class="submenu-toggle w-full flex justify-between items-center py-2 text-lg font-semibold">
+                    <span>Transporte</span>
+                    <svg class="submenu-arrow w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div class="submenu-content pl-4 pt-2 space-y-2">
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Colectivos</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Uber</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Cabify</a>
+                    <a href="#" class="block px-3 py-1 hover:bg-gray-100 rounded">Taxis / Remis</a>
+                </div>
+            </div>
+            <!-- (Repetir estructura .submenu para las demás categorías: Profesionales, Mudanza, Compras, etc.) -->
+
+        </div>
+    </div>
+
+
+    <!-- ========= CONTENIDO PRINCIPAL DE LA PÁGINA ========= -->
+    <main>
+        <!-- Sección Carrusel de Barrios -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-10">Explorá los Barrios</h2>
+                
+                <div class="relative flex items-center">
+                    <!-- Flecha Izquierda -->
+                    <button id="scroll-left" class="absolute left-0 z-10 bg-white/70 p-2 rounded-full shadow-md hover:bg-white transition-all -ml-4">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+
+                    <!-- Contenedor del Carrusel -->
+                    <div id="barrios-container" class="no-scrollbar flex-1 overflow-x-auto scroll-smooth py-4">
+                        <div class="inline-flex space-x-6 px-4">
+                            <!--
+                                Las imágenes de los barrios van aquí.
+                                Asegúrate de que los nombres de archivo sean correctos y estén en la misma carpeta.
+                            -->
+                            <a href="#" onclick="openModal('Nueva Córdoba', 'Aquí va la infografía sobre Nueva Córdoba...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="NUEVA CÓRDOBA 3000-8.png" alt="Mapa Nueva Córdoba" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Centro', 'Aquí va la infografía sobre el Centro...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="CENTRO 3000-8.png" alt="Mapa Centro" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('General Paz', 'Aquí va la infografía sobre General Paz...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="GENERAL PAZ 3000-8.png" alt="Mapa General Paz" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Güemes', 'Aquí va la infografía sobre Güemes...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="GUEMES 3000-8.png" alt="Mapa Güemes" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Alberdi', 'Aquí va la infografía sobre Alberdi...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="ALBERDI 3000-8.png" alt="Mapa Alberdi" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Alto Alberdi', 'Aquí va la infografía sobre Alto Alberdi...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="ALTO ALBERDI 3000-8.png" alt="Mapa Alto Alberdi" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Urca', 'Aquí va la infografía sobre Urca...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="URCA 3000.png" alt="Mapa Urca" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Cerro de las Rosas', 'Aquí va la infografía sobre el Cerro...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="CERRO DE LAS ROSAS 3000-8.png" alt="Mapa Cerro" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Villa Belgrano', 'Aquí va la infografía sobre Villa Belgrano...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="VILLA BELGRANO 3000-8.png" alt="Mapa Villa Belgrano" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                            <a href="#" onclick="openModal('Argüello', 'Aquí va la infografía sobre Argüello...')" class="barrio-item-map flex-shrink-0 h-64 w-64">
+                                <img src="ARGUELLO 3000-8.png" alt="Mapa Argüello" class="h-64 w-64 object-contain rounded-lg hover:scale-105 transition-transform">
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Flecha Derecha -->
+                    <button id="scroll-right" class="absolute right-0 z-10 bg-white/70 p-2 rounded-full shadow-md hover:bg-white transition-all -mr-4">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Google Maps -->
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-10">Mapa de la Ciudad</h2>
+                <div class="w-full h-[500px] rounded-lg overflow-hidden shadow-xl border border-gray-200">
+                    <iframe src="https://www.google.com/maps/d/embed?mid=1X3akNKjXvBbUE_ptzXz25CCcpFKWQ3k&ehbc=2E312F" width="100%" height="100%"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Categorías con Botones -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-10">Información General</h2>
+                <div class="space-y-12">
+                    
+                    <!-- Fila de Categoría: SALUD -->
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#0069B4] border-b-2 border-[#0069B4] pb-2 inline-block">Salud</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Hospitales', 'Aquí va la info de Hospitales...')" class="cat-btn bg-[#0069B4]">Hospitales</button>
+                            <button onclick="openModal('Urgencias', 'Aquí va la info de Urgencias...')" class="cat-btn bg-[#0069B4]">Urgencias</button>
+                            <button onclick="openModal('Obras Sociales', 'Aquí va la info de Obras Sociales...')" class="cat-btn bg-[#0069B4]">Obras Sociales</button>
+                            <button onclick="openModal('Farmacias', 'Aquí va la info de Farmacias...')" class="cat-btn bg-[#0069B4]">Farmacias</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Fila de Categoría: CASA -->
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#BF1C39] border-b-2 border-[#BF1C39] pb-2 inline-block">Casa</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Bazar', 'Aquí va la info de Bazar...')" class="cat-btn bg-[#BF1C39]">Bazar</button>
+                            <button onclick="openModal('Ferretería', 'Aquí va la info de Ferretería...')" class="cat-btn bg-[#BF1C39]">Ferretería</button>
+                            <button onclick="openModal('Electrodomésticos', 'Aquí va la info de Electrodomésticos...')" class="cat-btn bg-[#BF1C39]">Electrodomésticos</button>
+                        </div>
+                    </div>
+
+                    <!-- Fila de Categoría: PROFESIONALES -->
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#951B81] border-b-2 border-[#951B81] pb-2 inline-block">Profesionales</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Gasista', 'Aquí va la info de Gasistas...')" class="cat-btn bg-[#951B81]">Gasista</button>
+                            <button onclick="openModal('Electricista', 'Aquí va la info de Electricistas...')" class="cat-btn bg-[#951B81]">Electricista</button>
+                            <button onclick="openModal('Plomero', 'Aquí va la info de Plomeros...')" class="cat-btn bg-[#951B81]">Plomero</button>
+                            <button onclick="openModal('Técnico en Aire', 'Aquí va la info de Técnicos de Aire...')" class="cat-btn bg-[#951B81]">Técnico en Aire</button>
+                            <button onclick="openModal('Técnico en Electrodomésticos', 'Aquí va la info de Técnicos...')" class="cat-btn bg-[#951B81]">Téc. Electrodomésticos</button>
+                            <button onclick="openModal('Cerrajero', 'Aquí va la info de Cerrajeros...')" class="cat-btn bg-[#951B81]">Cerrajero</button>
+                        </div>
+                    </div>
+                                        <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#EC6608] border-b-2 border-[#EC6608] pb-2 inline-block">Mudanza</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Gasista', 'Aquí va la info de Gasistas...')" class="cat-btn bg-[#EC6608]">Inmobiliaria</button>
+                            <button onclick="openModal('Electricista', 'Aquí va la info de Electricistas...')" class="cat-btn bg-[#EC6608]">Servicios de Mudanza</button>
+                            <button onclick="openModal('Plomero', 'Aquí va la info de Plomeros...')" class="cat-btn bg-[#EC6608]">Residencias</button>
+                            <button onclick="openModal('Técnico en Aire', 'Aquí va la info de Técnicos de Aire...')" class="cat-btn bg-[#EC6608]">Escribanía</button>
+                        </div>
+                    </div>
+                                        <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#009641] border-b-2 border-[#009641] pb-2 inline-block">Compras</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Gasista', 'Aquí va la info de Gasistas...')" class="cat-btn bg-[#009641]">Supermercados</button>
+                            <button onclick="openModal('Electricista', 'Aquí va la info de Electricistas...')" class="cat-btn bg-[#009641]">Verdulería / Feria</button>
+                            <button onclick="openModal('Plomero', 'Aquí va la info de Plomeros...')" class="cat-btn bg-[#009641]">Carnicería</button>
+                            <button onclick="openModal('Técnico en Aire', 'Aquí va la info de Técnicos de Aire...')" class="cat-btn bg-[#009641]">Dietética</button>
+                            <button onclick="openModal('Técnico en Electrodomésticos', 'Aquí va la info de Técnicos...')" class="cat-btn bg-[#009641]">Distribuidora</button>
+                        </div>
+                    </div>
+                                        <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#00A7E7] border-b-2 border-[#00A7E7] pb-2 inline-block">Estudio</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Gasista', 'Aquí va la info de Gasistas...')" class="cat-btn bg-[#00A7E7]">Bibliotecas</button>
+                            <button onclick="openModal('Electricista', 'Aquí va la info de Electricistas...')" class="cat-btn bg-[#00A7E7]">Coworking</button>
+                            <button onclick="openModal('Plomero', 'Aquí va la info de Plomeros...')" class="cat-btn bg-[#00A7E7]">Librería</button>
+                            <button onclick="openModal('Técnico en Aire', 'Aquí va la info de Técnicos de Aire...')" class="cat-btn bg-[#00A7E7]">Imprenta</button>
+                        </div>
+                    </div>
+                                        <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#FAB900] border-b-2 border-[#FAB900] pb-2 inline-block">Sociales</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Gasista', 'Aquí va la info de Gasistas...')" class="cat-btn bg-[#FAB900]">Café</button>
+                            <button onclick="openModal('Electricista', 'Aquí va la info de Electricistas...')" class="cat-btn bg-[#FAB900]">Restaurante</button>
+                            <button onclick="openModal('Plomero', 'Aquí va la info de Plomeros...')" class="cat-btn bg-[#FAB900]">Shopping</button>
+                            <button onclick="openModal('Técnico en Aire', 'Aquí va la info de Técnicos de Aire...')" class="cat-btn bg-[#FAB900]">Parque / Plaza</button>
+                            <button onclick="openModal('Técnico en Electrodomésticos', 'Aquí va la info de Técnicos...')" class="cat-btn bg-[#FAB900]">Museo</button>
+                        </div>
+                    </div>
+                                        <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#95C11F] border-b-2 border-[#95C11F] pb-2 inline-block">Deportes</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Gasista', 'Aquí va la info de Gasistas...')" class="cat-btn bg-[#95C11F]">Gimnasio</button>
+                            <button onclick="openModal('Electricista', 'Aquí va la info de Electricistas...')" class="cat-btn bg-[#95C11F]">Clubes Femeninos</button>
+                            <button onclick="openModal('Plomero', 'Aquí va la info de Plomeros...')" class="cat-btn bg-[#95C11F]">Clubes Masculinos</button>
+                            <button onclick="openModal('Técnico en Aire', 'Aquí va la info de Técnicos de Aire...')" class="cat-btn bg-[#95C11F]">Clubes Mixtos</button>
+                        </div>
+                    </div>
+                                        <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-[#BF1C39] border-b-2 border-[#BF1C39] pb-2 inline-block">Transporte</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('Gasista', 'Aquí va la info de Gasistas...')" class="cat-btn bg-[#BF1C39]">Colectivos</button>
+                            <button onclick="openModal('Electricista', 'Aquí va la info de Electricistas...')" class="cat-btn bg-[#BF1C39]">Uber</button>
+                            <button onclick="openModal('Plomero', 'Aquí va la info de Plomeros...')" class="cat-btn bg-[#BF1C39]">Cabify</button>
+                            <button onclick="openModal('Técnico en Aire', 'Aquí va la info de Técnicos de Aire...')" class="cat-btn bg-[#BF1C39]">Taxi / Remis</button>
+                        </div>
+                    </div>
+                    <!-- (Repetir la estructura para MUDANZA, COMPRAS, ESTUDIO, SOCIALES, DEPORTE, TRANSPORTE) -->
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto text-center px-4">
+            <p>© 2025 Guía del Estudiante Córdoba. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+
+    <!-- ========= SCRIPTS DE INTERACTIVIDAD ========= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- LÓGICA DEL MENÚ DESPLEGABLE ---
+            const menuToggleBtn = document.getElementById('menu-toggle-btn');
+            const menuCloseBtn = document.getElementById('menu-close-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // Abrir menú
+            menuToggleBtn.addEventListener('click', () => {
+                mobileMenu.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Evitar scroll del fondo
+                requestAnimationFrame(() => {
+                    mobileMenu.classList.remove('translate-x-full');
+                });
+            });
+
+            // Cerrar menú
+            const closeMenu = () => {
+                mobileMenu.classList.add('translate-x-full');
+                document.body.style.overflow = 'auto';
+                // Esperar que termine la animación para ocultarlo
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                }, 300);
+            };
+            menuCloseBtn.addEventListener('click', closeMenu);
+
+            // Lógica del acordeón (submenús)
+            document.querySelectorAll('.submenu-toggle').forEach(button => {
+                button.addEventListener('click', () => {
+                    const submenu = button.closest('.submenu');
+                    const currentState = submenu.dataset.state;
+                    
+                    // Opcional: cerrar otros submenús abiertos
+                    // document.querySelectorAll('.submenu[data-state="open"]').forEach(s => {
+                    //     if (s !== submenu) s.dataset.state = 'closed';
+                    // });
+
+                    // Abrir/cerrar el actual
+                    submenu.dataset.state = currentState === 'open' ? 'closed' : 'open';
+                });
+            });
+
+
+            // --- LÓGICA DEL CARRUSEL DE BARRIOS ---
+            const scrollLeftBtn = document.getElementById('scroll-left');
+            const scrollRightBtn = document.getElementById('scroll-right');
+            const barriosContainer = document.getElementById('barrios-container');
+            
+            const scrollAmount = 300; // Pixeles a mover por click
+            
+            scrollLeftBtn.addEventListener('click', () => {
+                barriosContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+            
+            scrollRightBtn.addEventListener('click', () => {
+                barriosContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+
+
+            // --- LÓGICA DEL MODAL (POP-UP) ---
+            const modal = document.getElementById('info-modal');
+            const modalOverlay = document.querySelector('.modal-overlay');
+            const modalContent = document.querySelector('.modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            // Función global para abrir el modal (la usaremos desde el HTML)
+            window.openModal = (title, content) => {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = `<p>${content}</p>`; // Usamos innerHTML para futuro contenido complejo
+                modal.classList.remove('hidden');
+                
+                // Animación de entrada
+                requestAnimationFrame(() => {
+                    modalOverlay.classList.remove('opacity-0');
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                });
+            };
+
+            // Función para cerrar el modal
+            const closeModal = () => {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                modalOverlay.classList.add('opacity-0');
+
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300); // Esperar a la animación
+            };
+
+            // Eventos para cerrar
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                // Si se hace clic en el fondo oscuro, cerrar
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+
+            // Evitar que los clics en los botones de categoría se propaguen (ya que el `onclick` los maneja)
+            document.querySelectorAll('.cat-btn, .barrio-item-map').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault(); // Evitar que los <a> hagan saltar la página
+                });
+            });
+
+            // Estilos para los botones de categorías (para no repetirlo en HTML)
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.add(
+                    'text-white', 'font-semibold', 'py-2', 'px-4', 
+                    'rounded-full', 'shadow-md', 'hover:opacity-80', 
+                    'transition-all', 'hover:shadow-lg', 'transform', 'hover:-translate-y-0.5'
+                );
+            });
+        });
+    </script>
+
+</body>
+</html>
